@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Nunito } from "next/font/google";
+import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "react-hot-toast";
+
+import Loading from "@/components/Loading";
+import { AppProvider } from "@/providers/AppProvider";
+import { TaskProvider } from "@/providers/TaskProvider";
+
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const nunito = Nunito({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,8 +22,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <head>
+          <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+            integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+          />
+        </head>
+        <body className={nunito.className}>
+          <ClerkLoading>
+            <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+              <Loading />
+            </div>
+          </ClerkLoading>
+          <ClerkLoaded>
+            <AppProvider>
+              <TaskProvider>{children}</TaskProvider>
+            </AppProvider>
+          </ClerkLoaded>
+          <Toaster position="top-center" />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

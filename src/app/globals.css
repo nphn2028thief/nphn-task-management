@@ -16,18 +16,69 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+html {
+  height: 100%;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+body {
+  height: 100%;
+  background-color: #181818;
+  color: #fff;
+  overflow: visible;
+}
+
+/* Scrollbar */
+html *::-webkit-scrollbar {
+  border-radius: 0;
+  width: 4px;
+}
+
+html *::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: #ccc;
+}
+
+html *::-webkit-scrollbar-track {
+  border-radius: 0;
+  background-color: transparent;
+}
+
+input,
+textarea,
+button {
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  width: 1.4rem;
+  height: 1.4rem;
+  cursor: pointer;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #27ae60;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

@@ -1,0 +1,72 @@
+.wrapper {
+  flex: 1;
+  padding-right: 12px;
+  margin-right: -18px;
+  overflow: auto;
+
+  .task-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+
+    .skeleton,
+    .task-item,
+    .create-task-btn {
+      height: 174px;
+      border-radius: 10px;
+    }
+
+    .skeleton {
+      background-color: #2a2e35;
+    }
+
+    .task-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px;
+      background-color: rgba(249, 249, 249, 0.08);
+      box-shadow: 1px 7px 12px rgba(8, 18, 69, 0.1);
+      border: 2px solid transparent;
+
+      .status {
+        text-transform: capitalize;
+        padding: 4px 12px;
+        border-radius: 999px;
+      }
+
+      .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        button {
+          display: flex;
+          padding: 6px;
+          transition: opacity 0.3s ease;
+
+          &:hover {
+            opacity: 0.7;
+          }
+        }
+      }
+    }
+
+    .create-task-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      text-transform: capitalize;
+      font-weight: 600;
+      padding: 0 12px;
+      border: 2px dashed transparent;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #dbe1e8;
+        background-color: #2a2e35;
+      }
+    }
+  }
+}
