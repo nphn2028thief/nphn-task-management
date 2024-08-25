@@ -1,0 +1,102 @@
+.wrapper {
+  width: 460px;
+  max-width: calc(100% - 32px);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 16px;
+  background-color: #212121;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  z-index: 99;
+
+  form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    h1 {
+      font-size: clamp(16px, 5vw, 20px);
+      color: #f8f8f8;
+      font-weight: 700;
+    }
+
+    .form-container {
+      flex: 1;
+      overflow: auto;
+
+      .form-control,
+      .form-control-toggle {
+        display: flex;
+        font-weight: 600;
+
+        label {
+          color: #b2becd;
+        }
+      }
+
+      .form-control {
+        flex-direction: column;
+        gap: 4px;
+
+        input,
+        textarea {
+          width: 100%;
+          padding: 10px;
+          color: #b2becd;
+          background-color: #131313;
+          border-radius: 4px;
+
+          &::selection {
+            // background-color: transparent;
+          }
+        }
+
+        & + .form-control,
+        + .form-control-toggle {
+          margin-top: 20px;
+        }
+      }
+
+      .form-control-toggle {
+        align-items: center;
+        gap: 8px;
+
+        label {
+          flex: 1;
+          padding: 8px 0;
+          transition: all 0.2s ease;
+          cursor: pointer;
+
+          &:hover {
+            opacity: 0.8;
+          }
+        }
+
+        & + .form-control-toggle {
+          margin-top: 4px;
+        }
+      }
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 8px;
+      // box-shadow: 4px 0 8px #ccc;
+
+      button {
+        padding: 6px 12px;
+        border-radius: 4px;
+        transition: opacity 0.3s ease;
+
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+}

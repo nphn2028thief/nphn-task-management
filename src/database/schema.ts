@@ -12,6 +12,7 @@ import {
 export const typeEnum = pgEnum("type", ["FOLDER", "FILE"]);
 export const fileTypeEnum = pgEnum("file_type", ["txt", "md"]);
 
+// Tasks table
 export const tasks = pgTable("tasks", {
   id: serial("id").primaryKey(),
   title: text("title"),
@@ -28,6 +29,7 @@ export const tasks = pgTable("tasks", {
     .default(sql`now()`),
 });
 
+// Trees table
 export const trees = pgTable("trees", {
   id: serial("id").primaryKey(),
   name: text("title").notNull(),

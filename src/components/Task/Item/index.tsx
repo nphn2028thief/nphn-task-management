@@ -25,13 +25,42 @@ interface IProps {
 function TaskItem(props: IProps) {
   const { data } = props;
 
-  const { setIsOpenPanel, setIsLoading } = useContext(AppContext);
+  const { setIsOpenModal, setIsLoading } = useContext(AppContext);
   const { tasks, setTask, setTasks } = useContext(TaskContext);
 
   const { theme } = useTheme((state) => state);
 
+  const handleChangeStatusTask = async () => {
+    setIsLoading(true);
+
+    try {
+      const { data: responseData } = await axios.patch<IResponse<ITask[]>>(
+        `${EAPI_URL.TASKS}/${data.id}`,
+        { isCompleted: true }
+      );
+
+      if (responseData.errorMessage) {
+        toast.error(responseData.errorMessage);
+        return;
+      }
+
+      setTasks(
+        tasks.map((item) =>
+          item.id === data.id ? { ...item, ...responseData.data[0] } : item
+        )
+      );
+      toast.success("Change status task successfully!");
+      return;
+    } catch (error) {
+      toast.error(CATCH_ERROR_MESSAGE);
+    } finally {
+      setIsOpenModal(false);
+      setIsLoading(false);
+    }
+  };
+
   const handleEditTask = (task: ITask) => {
-    setIsOpenPanel(true);
+    setIsOpenModal(true);
     setTask(task);
   };
 
@@ -79,12 +108,13 @@ function TaskItem(props: IProps) {
               completed
             </span>
           ) : (
-            <span
+            <button
               style={{ backgroundColor: theme.colorDanger }}
-              className={clsx(styles.status)}
+              className={clsx(styles.status, "hover:opacity-80")}
+              onClick={handleChangeStatusTask}
             >
               incompleted
-            </span>
+            </button>
           )}
           <RenderIf isTrue={data.isImportant}>
             <p

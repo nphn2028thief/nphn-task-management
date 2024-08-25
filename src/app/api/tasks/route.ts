@@ -2,8 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { asc, sql } from "drizzle-orm";
 
-import { db } from "@/drizzle/db";
-import { tasks } from "@/drizzle/schema";
+import { db } from "@/database/db";
+import { tasks } from "@/database/schema";
 
 async function POST(req: Request, res: Response) {
   try {

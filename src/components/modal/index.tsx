@@ -8,23 +8,23 @@ import { AppContext } from "@/providers/AppProvider";
 import { TaskContext } from "@/providers/TaskProvider";
 
 interface IProps {
-  isOpenPanel: boolean;
+  isOpen: boolean;
   children: ReactNode;
 }
 
-function Panel(props: IProps) {
-  const { isOpenPanel, children } = props;
+function Modal(props: IProps) {
+  const { isOpen, children } = props;
 
-  const { setIsOpenPanel } = useContext(AppContext);
+  const { setIsOpenModal } = useContext(AppContext);
   const { setTask } = useContext(TaskContext);
 
   const handleClosePanel = () => {
-    setIsOpenPanel(false);
+    setIsOpenModal(false);
     setTask(null);
   };
 
   const handleRenderChildren = () => {
-    if (isOpenPanel) {
+    if (isOpen) {
       return (
         <>
           <motion.div
@@ -50,4 +50,4 @@ function Panel(props: IProps) {
   );
 }
 
-export default Panel;
+export default Modal;

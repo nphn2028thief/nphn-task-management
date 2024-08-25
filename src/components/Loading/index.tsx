@@ -19,9 +19,10 @@ function Loading(props: IProps) {
 
   return (
     <div
+      style={{ zIndex }}
       className={`flex ${position} left-1/2 top-1/2 ${
         !noTransform && "-translate-x-1/2 -translate-y-1/2"
-      } z-[${zIndex}]`}
+      }`}
     >
       <span className={clsx(styles.loader, className)}></span>
     </div>

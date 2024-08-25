@@ -19,7 +19,7 @@ function TaskList() {
   const pathname = usePathname();
 
   const { tasks, isLoadingTask } = useContext(TaskContext);
-  const { setIsOpenPanel } = useContext(AppContext);
+  const { setIsOpenModal } = useContext(AppContext);
 
   const { theme } = useTheme((state) => state);
 
@@ -54,7 +54,7 @@ function TaskList() {
               borderColor: theme.colorGrey5,
             }}
             className={clsx(styles["create-task-btn"])}
-            onClick={() => setIsOpenPanel(true)}
+            onClick={() => setIsOpenModal(true)}
           >
             <i className={plus}></i>
             add new task

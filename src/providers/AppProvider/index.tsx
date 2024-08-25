@@ -7,37 +7,37 @@ import Loading from "@/components/Loading";
 import RenderIf from "@/components/RenderIf";
 
 interface AppContextType {
-  isOpenPanel: boolean;
+  isOpenModal: boolean;
   isLoading: boolean;
-  setIsOpenPanel: (isOpenPanel: boolean) => void;
+  setIsOpenModal: (isOpenModal: boolean) => void;
   setIsLoading: (isLoading: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType>({
-  isOpenPanel: false,
+  isOpenModal: false,
   isLoading: false,
-  setIsOpenPanel: () => {},
+  setIsOpenModal: () => {},
   setIsLoading: () => {},
 });
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [isOpenPanel, setOpenPanel] = useState(false);
+  const [isOpenModal, setOpenModal] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
-  const setIsOpenPanel = (value: boolean) => setOpenPanel(value);
+  const setIsOpenModal = (value: boolean) => setOpenModal(value);
   const setIsLoading = (value: boolean) => setLoading(value);
 
   return (
     <AppContext.Provider
-      value={{ isLoading, isOpenPanel, setIsOpenPanel, setIsLoading }}
+      value={{ isLoading, isOpenModal, setIsOpenModal, setIsLoading }}
     >
       <RenderIf isTrue={isLoading}>
         <Portal>
           <div
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
-            className="fixed inset-0 z-[99999]"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.2)", zIndex: 9999 }}
+            className="fixed inset-0"
           >
-            <Loading position="fixed" zIndex={99999} />
+            <Loading position="fixed" zIndex={9999} />
           </div>
         </Portal>
       </RenderIf>

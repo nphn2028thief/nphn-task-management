@@ -2,8 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { sql } from "drizzle-orm";
 
-import { db } from "@/drizzle/db";
-import { tasks } from "@/drizzle/schema";
+import { db } from "@/database/db";
+import { tasks } from "@/database/schema";
 
 async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
@@ -35,21 +35,9 @@ async function PATCH(req: Request, { params }: { params: { id: string } }) {
         isImportant,
         userId,
       })
-      .where(sql`${tasks.id} = ${id}`);
+      .where(sql`${tasks.id} = ${id}`)
+      .returning();
 
-    // .tasks.update({
-    //   data: {
-    //     title,
-    //     description,
-    //     date,
-    //     isCompleted,
-    //     isImportant,
-    //     userId,
-    //   },
-    //   where: {
-    //     id,
-    //   },
-    // });
     return NextResponse.json({ data: updatedTask, status: 200 });
   } catch (error) {
     console.error("Edit task error: ", error);
@@ -78,12 +66,6 @@ async function DELETE(req: Request, { params }: { params: { id: string } }) {
     }
 
     const deletedTask = await db.delete(tasks).where(sql`${tasks.id} = ${id}`);
-
-    // prismaClient.tasks.delete({
-    //   where: {
-    //     id,
-    //   },
-    // });
     return NextResponse.json({ data: deletedTask, status: 200 });
   } catch (error) {
     console.error("Delete task error: ", error);
