@@ -1,4 +1,4 @@
-export interface IReponse<T> {
+export interface IResponse<T> {
   errorMessage?: string;
   data: T;
   status: number;

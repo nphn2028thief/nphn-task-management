@@ -1,6 +1,9 @@
-import prismaClient from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { sql } from "drizzle-orm";
+
+import { db } from "@/drizzle/db";
+import { tasks } from "@/drizzle/schema";
 
 async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
@@ -22,20 +25,32 @@ async function PATCH(req: Request, { params }: { params: { id: string } }) {
     const { title, description, date, isImportant, isCompleted } =
       await req.json();
 
-    const task = await prismaClient.task.update({
-      data: {
+    const updatedTask = await db
+      .update(tasks)
+      .set({
         title,
         description,
         date,
         isCompleted,
         isImportant,
         userId,
-      },
-      where: {
-        id,
-      },
-    });
-    return NextResponse.json({ data: task, status: 200 });
+      })
+      .where(sql`${tasks.id} = ${id}`);
+
+    // .tasks.update({
+    //   data: {
+    //     title,
+    //     description,
+    //     date,
+    //     isCompleted,
+    //     isImportant,
+    //     userId,
+    //   },
+    //   where: {
+    //     id,
+    //   },
+    // });
+    return NextResponse.json({ data: updatedTask, status: 200 });
   } catch (error) {
     console.error("Edit task error: ", error);
     return NextResponse.json({
@@ -62,12 +77,14 @@ async function DELETE(req: Request, { params }: { params: { id: string } }) {
       });
     }
 
-    const task = await prismaClient.task.delete({
-      where: {
-        id,
-      },
-    });
-    return NextResponse.json({ data: task, status: 200 });
+    const deletedTask = await db.delete(tasks).where(sql`${tasks.id} = ${id}`);
+
+    // prismaClient.tasks.delete({
+    //   where: {
+    //     id,
+    //   },
+    // });
+    return NextResponse.json({ data: deletedTask, status: 200 });
   } catch (error) {
     console.error("Delete task error: ", error);
     return NextResponse.json({

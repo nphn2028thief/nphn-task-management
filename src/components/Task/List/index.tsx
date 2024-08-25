@@ -5,6 +5,7 @@ import { useContext } from "react";
 import clsx from "clsx";
 
 import TaskItem from "../Item";
+import RenderIf from "@/components/RenderIf";
 import { TaskContext } from "@/providers/TaskProvider";
 import { AppContext } from "@/providers/AppProvider";
 import { plus } from "@/constants/icons";
@@ -15,10 +16,10 @@ import { ITask } from "@/types/task";
 import styles from "./TaskList.module.scss";
 
 function TaskList() {
+  const pathname = usePathname();
+
   const { tasks, isLoadingTask } = useContext(TaskContext);
   const { setIsOpenPanel } = useContext(AppContext);
-
-  const pathname = usePathname();
 
   const { theme } = useTheme((state) => state);
 
@@ -46,7 +47,7 @@ function TaskList() {
     <div className={clsx(styles.wrapper)}>
       <div className={clsx(styles["task-list"])}>
         {handleRenderTasks()}
-        {!isLoadingTask && (
+        <RenderIf isTrue={!isLoadingTask}>
           <button
             style={{
               color: theme.colorGrey2,
@@ -58,7 +59,7 @@ function TaskList() {
             <i className={plus}></i>
             add new task
           </button>
-        )}
+        </RenderIf>
       </div>
     </div>
   );

@@ -1,14 +1,15 @@
 "use client";
 
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
 import toast from "react-hot-toast";
 
 import { CATCH_ERROR_MESSAGE } from "@/constants";
 import { EAPI_URL } from "@/constants/path";
-import { IReponse } from "@/types/api";
+import { IResponse } from "@/types/api";
 import { ITask } from "@/types/task";
+import { IChildrenProps } from "@/types/children";
 
 interface TaskContextType {
   task: ITask | null;
@@ -28,7 +29,7 @@ const TaskContext = createContext<TaskContextType>({
   setIsLoadingTask: () => {},
 });
 
-function TaskProvider({ children }: { children: ReactNode }) {
+function TaskProvider({ children }: IChildrenProps) {
   const [task, setTask] = useState<ITask | null>(null);
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [isLoadingTask, setIsLoadingTask] = useState<boolean>(false);
@@ -40,7 +41,7 @@ function TaskProvider({ children }: { children: ReactNode }) {
 
     const getAllTasks = async () => {
       try {
-        const { data } = await axios.get<IReponse<ITask[]>>(EAPI_URL.TASKS);
+        const { data } = await axios.get<IResponse<ITask[]>>(EAPI_URL.TASKS);
 
         if (data.errorMessage) {
           toast.error(data.errorMessage);

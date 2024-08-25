@@ -1,10 +1,6 @@
-import { ReactNode } from "react";
+import { IChildrenProps } from "@/types/children";
 
-interface IProps {
-  children: ReactNode;
-}
-
-function AuthLayout({ children }: IProps) {
+function AuthLayout({ children }: IChildrenProps) {
   return (
     <div className="h-full flex justify-center items-center">{children}</div>
   );

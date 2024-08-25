@@ -1,22 +1,22 @@
 "use client";
 
+import { useContext } from "react";
 import clsx from "clsx";
+import axios from "axios";
+import toast from "react-hot-toast";
 
-import { ITask } from "@/types/task";
-
-import useTheme from "@/hooks/useTheme";
+import RenderIf from "@/components/RenderIf";
+import { TaskContext } from "@/providers/TaskProvider";
+import { AppContext } from "@/providers/AppProvider";
 import { edit, trash } from "@/constants/icons";
+import { EAPI_URL } from "@/constants/path";
+import { CATCH_ERROR_MESSAGE } from "@/constants";
+import useTheme from "@/hooks/useTheme";
+import { IResponse } from "@/types/api";
+import { ITask } from "@/types/task";
 import { formatDate } from "@/lib/utils";
 
 import styles from "../List/TaskList.module.scss";
-import { useContext } from "react";
-import { TaskContext } from "@/providers/TaskProvider";
-import { AppContext } from "@/providers/AppProvider";
-import axios from "axios";
-import { EAPI_URL } from "@/constants/path";
-import { IReponse } from "@/types/api";
-import toast from "react-hot-toast";
-import { CATCH_ERROR_MESSAGE } from "@/constants";
 
 interface IProps {
   data: ITask;
@@ -39,7 +39,7 @@ function TaskItem(props: IProps) {
     setIsLoading(true);
 
     try {
-      const { data } = await axios.delete<IReponse<ITask>>(
+      const { data } = await axios.delete<IResponse<ITask>>(
         `${EAPI_URL.TASKS}/${taskId}`
       );
 
@@ -86,14 +86,14 @@ function TaskItem(props: IProps) {
               incompleted
             </span>
           )}
-          {data.isImportant && (
+          <RenderIf isTrue={data.isImportant}>
             <p
               style={{ backgroundColor: theme.colorDanger }}
               className={clsx(styles.status)}
             >
               important
             </p>
-          )}
+          </RenderIf>
         </div>
 
         {/* Action buttons */}

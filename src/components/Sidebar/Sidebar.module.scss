@@ -47,7 +47,6 @@
     flex-direction: column;
     justify-content: center;
     padding: 8px 0;
-    // padding-left: 16px;
 
     .nav-item {
       display: flex;
@@ -64,6 +63,11 @@
 
       & + .nav-item {
         margin-top: 8px;
+      }
+
+      &::before,
+      &::after {
+        transition: all 0.3s ease;
       }
 
       &::before {
@@ -90,19 +94,19 @@
       }
 
       &:hover:not(.nav-item-active) {
+        color: #fff;
+
         &::before {
           width: 100%;
-          transition: all 0.3s ease;
         }
 
         &::after {
           background-color: #27ae60;
-          transition: all 0.3s ease;
         }
       }
 
       &.nav-item-active {
-        color: rgba(249, 249, 249, 0.75);
+        color: #fff;
         background-color: rgba(249, 249, 249, 0.08);
 
         &::after {

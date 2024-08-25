@@ -4,6 +4,7 @@ import { createContext, useState, ReactNode } from "react";
 
 import Portal from "@/components/Portal";
 import Loading from "@/components/Loading";
+import RenderIf from "@/components/RenderIf";
 
 interface AppContextType {
   isOpenPanel: boolean;
@@ -30,16 +31,16 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
     <AppContext.Provider
       value={{ isLoading, isOpenPanel, setIsOpenPanel, setIsLoading }}
     >
-      {isLoading && (
+      <RenderIf isTrue={isLoading}>
         <Portal>
           <div
             style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
             className="fixed inset-0 z-[99999]"
           >
-            <Loading position="fixed" />
+            <Loading position="fixed" zIndex={99999} />
           </div>
         </Portal>
-      )}
+      </RenderIf>
       {children}
     </AppContext.Provider>
   );

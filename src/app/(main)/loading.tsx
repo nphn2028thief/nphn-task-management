@@ -1,7 +1,7 @@
 import Loading from "@/components/Loading";
 
 function MainLoading() {
-  return <Loading />;
+  return <Loading zIndex={99999} />;
 }
 
 export default MainLoading;

@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1724558554056,
+      "tag": "20240825040234_lumpy_scarlet_spider",
+      "breakpoints": true
+    }
+  ]
+}

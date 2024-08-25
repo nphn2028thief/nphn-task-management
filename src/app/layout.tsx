@@ -4,10 +4,9 @@ import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
 
 import Loading from "@/components/Loading";
-import { AppProvider } from "@/providers/AppProvider";
-import { TaskProvider } from "@/providers/TaskProvider";
+import RootProvider from "@/providers";
 
-import "./globals.css";
+import "./globals.scss";
 
 const nunito = Nunito({ subsets: ["latin"] });
 
@@ -36,13 +35,11 @@ export default function RootLayout({
         <body className={nunito.className}>
           <ClerkLoading>
             <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Loading />
+              <Loading zIndex={99999} />
             </div>
           </ClerkLoading>
           <ClerkLoaded>
-            <AppProvider>
-              <TaskProvider>{children}</TaskProvider>
-            </AppProvider>
+            <RootProvider>{children}</RootProvider>
           </ClerkLoaded>
           <Toaster position="top-center" />
         </body>

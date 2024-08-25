@@ -14,7 +14,7 @@ import { CATCH_ERROR_MESSAGE } from "@/constants";
 import { EAPI_URL } from "@/constants/path";
 import { AppContext } from "@/providers/AppProvider";
 import { TaskContext } from "@/providers/TaskProvider";
-import { IReponse } from "@/types/api";
+import { IResponse } from "@/types/api";
 import { ITask } from "@/types/task";
 
 import styles from "./TaskPanel.module.scss";
@@ -82,7 +82,7 @@ function TaskPanel() {
     try {
       // Case edit
       if (task && taskId) {
-        const { data: responseData } = await axios.patch<IReponse<ITask>>(
+        const { data: responseData } = await axios.patch<IResponse<ITask[]>>(
           `${EAPI_URL.TASKS}/${taskId}`,
           data
         );
@@ -94,7 +94,7 @@ function TaskPanel() {
 
         setTasks(
           tasks.map((item) =>
-            item.id === taskId ? { ...item, ...responseData.data } : item
+            item.id === taskId ? { ...item, ...responseData.data[0] } : item
           )
         );
         toast.success("Edit task successfully!");
@@ -102,7 +102,7 @@ function TaskPanel() {
       }
 
       // Case create
-      const { data: responseData } = await axios.post<IReponse<ITask>>(
+      const { data: responseData } = await axios.post<IResponse<ITask[]>>(
         EAPI_URL.TASKS,
         data
       );
@@ -112,7 +112,7 @@ function TaskPanel() {
         return;
       }
 
-      setTasks([...tasks, { ...responseData.data }]);
+      setTasks([...tasks, { ...responseData.data[0] }]);
       toast.success("Create new task successfully!");
     } catch (error) {
       toast.error(CATCH_ERROR_MESSAGE);

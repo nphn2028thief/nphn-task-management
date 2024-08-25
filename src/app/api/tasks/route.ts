@@ -1,6 +1,9 @@
-import prismaClient from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { asc, sql } from "drizzle-orm";
+
+import { db } from "@/drizzle/db";
+import { tasks } from "@/drizzle/schema";
 
 async function POST(req: Request, res: Response) {
   try {
@@ -16,17 +19,18 @@ async function POST(req: Request, res: Response) {
       return NextResponse.json({ errorMessage: "Bad request", status: 400 });
     }
 
-    const task = await prismaClient.task.create({
-      data: {
+    const newTask = await db
+      .insert(tasks)
+      .values({
         title,
         description,
         date,
         isCompleted: false,
         isImportant,
         userId,
-      },
-    });
-    return NextResponse.json({ data: task, status: 201 });
+      })
+      .returning();
+    return NextResponse.json({ data: newTask, status: 201 });
   } catch (error) {
     console.error("Create task: ", error);
     return NextResponse.json({
@@ -44,29 +48,18 @@ async function GET(req: Request, res: Response) {
       return NextResponse.json({ errorMessage: "Unauthorized!", status: 401 });
     }
 
-    const tasks = await prismaClient.task.findMany({
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        date: true,
-        isCompleted: true,
-        isImportant: true,
-        userId: false,
-        createdAt: true,
-        updatedAt: true,
-      },
-      where: {
-        userId,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-    });
-    return NextResponse.json({ data: tasks, status: 200 });
+    const allTasks = await db
+      .select()
+      .from(tasks)
+      .where(sql`${tasks.userId} = ${userId}`)
+      .orderBy(asc(tasks.createdAt));
+    return NextResponse.json({ data: allTasks, status: 200 });
   } catch (error) {
-    console.error("Get task error: ", error);
-    return NextResponse.json({ errorMessage: "Get task failed!", status: 500 });
+    console.error("Get tasks error: ", error);
+    return NextResponse.json({
+      errorMessage: "Get tasks failed!",
+      status: 500,
+    });
   }
 }
 
