@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --error-color: #ff0033;
+}
+
 * {
   margin: 0;
   padding: 0;

@@ -1,4 +1,4 @@
-import { check, home, list, todo } from "./icons";
+import { check, home, list, shapes, todo } from "./icons";
 import { EPath } from "./path";
 import IMenu from "@/types/menu";
 
@@ -26,6 +26,12 @@ const CMenu: IMenu[] = [
     title: "must do",
     icon: todo,
     link: EPath.INCOMPLETED,
+  },
+  {
+    id: 5,
+    title: "folders",
+    icon: shapes,
+    link: EPath.FOLDERS,
   },
 ];
 

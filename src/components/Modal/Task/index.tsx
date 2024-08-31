@@ -2,40 +2,35 @@
 
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import * as Yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 
-import Modal from "@/components/modal";
+import Modal from "@/components/Modal";
 import RenderIf from "@/components/RenderIf";
+import { Checkbox } from "@/components/HookForm";
 import { CATCH_ERROR_MESSAGE } from "@/constants";
 import { EAPI_URL } from "@/constants/path";
 import { edit, plus } from "@/constants/icons";
 import { AppContext } from "@/providers/AppProvider";
 import { TaskContext } from "@/providers/TaskProvider";
 import { IResponse } from "@/types/api";
-import { ITask } from "@/types/task";
+import { ITask, ITaskRequest } from "@/types/task";
 
 import styles from "./TaskModal.module.scss";
+import Input from "@/components/HookForm/Input";
+import Textarea from "@/components/HookForm/Textarea";
 
-const Schema = z
-  .object({
-    title: z.string(),
-    description: z.string().optional(),
-    date: z.string(),
-    isCompleted: z.boolean(),
-    isImportant: z.boolean(),
-  })
-  .required({
-    title: true,
-    date: true,
-    isImportant: true,
-  });
-
-type TSchema = z.infer<typeof Schema>;
+const Schema = Yup.object({
+  title: Yup.string().required("Title is required."),
+  description: Yup.string().optional(),
+  date: Yup.string().required("Date is required."),
+  isCompleted: Yup.boolean().optional(),
+  isImportant: Yup.boolean().optional(),
+});
 
 function TaskPanel() {
   const [taskId, setTaskId] = useState<string | null>(null);
@@ -43,8 +38,8 @@ function TaskPanel() {
   const { isOpenModal, setIsOpenModal, setIsLoading } = useContext(AppContext);
   const { task, tasks, setTask, setTasks } = useContext(TaskContext);
 
-  const defaultValues = useMemo<TSchema>(() => {
-    const data: TSchema = {
+  const defaultValues = useMemo<ITaskRequest>(() => {
+    const data: ITaskRequest = {
       title: "",
       description: "",
       date: "",
@@ -65,9 +60,14 @@ function TaskPanel() {
     return data;
   }, [task]);
 
-  const { register, reset, handleSubmit } = useForm<TSchema>({
+  const {
+    register,
+    reset,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<ITaskRequest>({
     defaultValues,
-    resolver: zodResolver(Schema),
+    resolver: yupResolver(Schema),
   });
 
   useEffect(() => {
@@ -81,7 +81,7 @@ function TaskPanel() {
     setTaskId(null);
   };
 
-  const onSubmit = async (data: TSchema) => {
+  const onSubmit = async (data: ITaskRequest) => {
     setIsLoading(true);
 
     try {
@@ -142,32 +142,22 @@ function TaskPanel() {
           </div>
 
           <div className={clsx(styles["form-container"])}>
-            <div className={clsx(styles["form-control"])}>
-              <label htmlFor="title" className="text-sm">
-                Title
-              </label>
-              <input
-                type="text"
-                id="title"
-                placeholder="E.g. Learn Chinese"
-                spellCheck={false}
-                className="placeholder:text-sm"
-                {...register("title")}
-              />
-            </div>
-            <div className={clsx(styles["form-control"])}>
-              <label htmlFor="description" className="text-sm">
-                Description
-              </label>
-              <textarea
-                id="description"
-                placeholder="E.g. Go to SuperChinese app to start learning"
-                rows={4}
-                spellCheck={false}
-                className="placeholder:text-sm"
-                {...register("description")}
-              />
-            </div>
+            <Input
+              label="Title"
+              register={register("title")}
+              wrapperClassName={clsx(styles["form-control"])}
+              errorMessage={errors.title?.message}
+              name="title"
+              id="title"
+              placeholder="E.g. Learn Chinese"
+            />
+            <Textarea
+              label="Description (Optional)"
+              register={register("description")}
+              wrapperClassName={clsx(styles["form-control"])}
+              id="description"
+              placeholder="E.g. Go to SuperChinese app to start learning"
+            />
             <div className={clsx(styles["form-control"])}>
               <label htmlFor="date" className="text-sm">
                 Date
@@ -180,20 +170,12 @@ function TaskPanel() {
             </div>
             <RenderIf isTrue={!!task}>
               <div className={clsx(styles["form-control-toggle"], "!-mb-2")}>
-                <input
-                  type="checkbox"
-                  id="isCompleted"
-                  {...register("isCompleted")}
-                />
+                <Checkbox id="isCompleted" register={register("isCompleted")} />
                 <label htmlFor="isCompleted">Complete</label>
               </div>
             </RenderIf>
             <div className={clsx(styles["form-control-toggle"])}>
-              <input
-                type="checkbox"
-                id="isImportant"
-                {...register("isImportant")}
-              />
+              <Checkbox id="isImportant" register={register("isImportant")} />
               <label htmlFor="isImportant">Important</label>
             </div>
           </div>

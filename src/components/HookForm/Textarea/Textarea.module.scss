@@ -1,0 +1,28 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: 600;
+
+  label {
+    color: #b2becd;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 10px;
+    color: #b2becd;
+    background-color: #131313;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: #27ae60 !important;
+    }
+
+    &:focus {
+      border-color: #27ae60 !important;
+    }
+  }
+}

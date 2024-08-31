@@ -1,6 +1,6 @@
 import PageTitle from "@/components/PageTitle";
 import TaskList from "@/components/Task/List";
-import TaskPanel from "@/components/modal/Task";
+import TaskPanel from "@/components/Modal/Task";
 
 function CompletedPage() {
   return (
