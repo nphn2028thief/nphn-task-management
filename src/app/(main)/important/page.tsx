@@ -1,6 +1,12 @@
+import { Metadata } from "next";
+
 import PageTitle from "@/components/PageTitle";
 import TaskList from "@/components/Task/List";
 import TaskPanel from "@/components/Modal/Task";
+
+export const metadata: Metadata = {
+  title: "Important tasks",
+};
 
 function ImportantPage() {
   return (

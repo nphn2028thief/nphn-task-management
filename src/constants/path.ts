@@ -2,7 +2,7 @@ enum EPath {
   HOME = "/",
   IMPORTANT = "/important",
   COMPLETED = "/completed",
-  INCOMPLETED = "/incompleted",
+  INCOMPLETE = "/incomplete",
   FOLDERS = "/folders",
   SIGN_IN = "/sign-in",
 }

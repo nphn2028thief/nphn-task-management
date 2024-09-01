@@ -5,5 +5,5 @@ import { EPath } from "./path";
 export const filterMap: Record<string, (task: ITask) => boolean> = {
   [EPath.IMPORTANT]: (task) => task.isImportant,
   [EPath.COMPLETED]: (task) => task.isCompleted,
-  [EPath.INCOMPLETED]: (task) => !task.isCompleted,
+  [EPath.INCOMPLETE]: (task) => !task.isCompleted,
 };

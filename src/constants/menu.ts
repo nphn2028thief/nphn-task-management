@@ -25,7 +25,7 @@ const CMenu: IMenu[] = [
     id: 4,
     title: "must do",
     icon: todo,
-    link: EPath.INCOMPLETED,
+    link: EPath.INCOMPLETE,
   },
   {
     id: 5,
