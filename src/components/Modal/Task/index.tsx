@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 
 import Modal from "@/components/Modal";
 import RenderIf from "@/components/RenderIf";
-import { Checkbox } from "@/components/HookForm";
+import { Checkbox, Input, Textarea } from "@/components/HookForm";
 import { CATCH_ERROR_MESSAGE } from "@/constants";
 import { EAPI_URL } from "@/constants/path";
 import { edit, plus } from "@/constants/icons";
@@ -21,8 +21,6 @@ import { IResponse } from "@/types/api";
 import { ITask, ITaskRequest } from "@/types/task";
 
 import styles from "./TaskModal.module.scss";
-import Input from "@/components/HookForm/Input";
-import Textarea from "@/components/HookForm/Textarea";
 
 const Schema = Yup.object({
   title: Yup.string().required("Title is required."),
@@ -168,6 +166,7 @@ function TaskPanel() {
                 {...register("date")}
               />
             </div>
+
             <RenderIf isTrue={!!task}>
               <div className={clsx(styles["form-control-toggle"], "!-mb-2")}>
                 <Checkbox id="isCompleted" register={register("isCompleted")} />
