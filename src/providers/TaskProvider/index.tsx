@@ -39,9 +39,14 @@ function TaskProvider({ children }: IChildrenProps) {
   useEffect(() => {
     setIsLoadingTask(true);
 
+    const controller = new AbortController();
+    const { signal } = controller;
+
     const getAllTasks = async () => {
       try {
-        const { data } = await axios.get<IResponse<ITask[]>>(EAPI_URL.TASKS);
+        const { data } = await axios.get<IResponse<ITask[]>>(EAPI_URL.TASKS, {
+          signal,
+        });
 
         if (data.errorMessage) {
           toast.error(data.errorMessage);
@@ -49,14 +54,22 @@ function TaskProvider({ children }: IChildrenProps) {
         }
 
         setTasks(data.data);
-      } catch (error) {
-        toast.error(CATCH_ERROR_MESSAGE);
-      } finally {
         setIsLoadingTask(false);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          return;
+        }
+
+        setIsLoadingTask(false);
+        toast.error(CATCH_ERROR_MESSAGE);
       }
     };
 
     user && getAllTasks();
+
+    return () => {
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
