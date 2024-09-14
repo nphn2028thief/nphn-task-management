@@ -1,0 +1,30 @@
+.wrapper {
+  width: var(--datepicker-width);
+  position: fixed;
+  padding: 12px;
+  background-color: #212121;
+  border: 1px solid rgba(249, 249, 249, 0.08);
+  border-radius: 4px;
+  z-index: 999;
+
+  .current-month-dates {
+    color: #f8f8f8;
+  }
+
+  .current-month-dates-bg {
+    background-color: #ff0033 !important;
+  }
+
+  .current-month-dates-bg-selected {
+    background-color: #27ae60;
+  }
+
+  .no-current-month-dates {
+    color: rgba(249, 249, 249, 0.35);
+  }
+
+  .date:hover {
+    color: #f8f8f8;
+    background-color: #27ae60;
+  }
+}

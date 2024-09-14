@@ -1,0 +1,32 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: 600;
+
+  label {
+    color: #b2becd;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    color: #b2becd;
+    background-color: #131313;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+
+    &:hover:not(.error) {
+      border-color: #27ae60 !important;
+    }
+
+    &:focus:not(.error) {
+      border-color: #27ae60 !important;
+    }
+  }
+
+  .error {
+    border-color: var(--error-color);
+  }
+}

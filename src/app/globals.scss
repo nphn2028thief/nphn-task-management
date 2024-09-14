@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 :root {
+  --datepicker-width: 292px;
+  --task-modal-padding: 16px;
+
   --error-color: #ff0033;
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
@@ -11,7 +11,12 @@ import toast from "react-hot-toast";
 
 import Modal from "@/components/Modal";
 import RenderIf from "@/components/RenderIf";
-import { Checkbox, Input, Textarea } from "@/components/HookForm";
+import {
+  Input,
+  Textarea,
+  InputDatepicker,
+  Checkbox,
+} from "@/components/HookForm";
 import { CATCH_ERROR_MESSAGE } from "@/constants";
 import { EAPI_URL } from "@/constants/path";
 import { edit, plus } from "@/constants/icons";
@@ -59,8 +64,12 @@ function TaskPanel() {
   }, [task]);
 
   const {
+    control,
     register,
+    setValue,
     reset,
+    watch,
+    setError,
     formState: { errors },
     handleSubmit,
   } = useForm<ITaskRequest>({
@@ -68,10 +77,19 @@ function TaskPanel() {
     resolver: yupResolver(Schema),
   });
 
+  const dateValue = watch("date");
+
   useEffect(() => {
     reset(defaultValues);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpenModal]);
+
+  useEffect(() => {
+    if (dateValue) {
+      setError("date", { message: "" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateValue]);
 
   const handleCloseModal = () => {
     setIsOpenModal(false);
@@ -156,17 +174,23 @@ function TaskPanel() {
               id="description"
               placeholder="E.g. Go to SuperChinese app to start learning"
             />
-            <div className={clsx(styles["form-control"])}>
-              <label htmlFor="date" className="text-sm">
-                Date
-              </label>
-              <input
-                type="date"
-                className="placeholder:text-sm"
-                {...register("date")}
-              />
-            </div>
-
+            <Controller
+              control={control}
+              name="date"
+              render={({ field: { value, name } }) => (
+                <InputDatepicker<ITaskRequest>
+                  label="Date"
+                  register={register("date")}
+                  value={value}
+                  setValue={setValue}
+                  wrapperClassName={clsx(styles["form-control"])}
+                  errorMessage={errors.date?.message}
+                  name={name}
+                  id="date"
+                  placeholder="Select date"
+                />
+              )}
+            />
             <RenderIf isTrue={!!task}>
               <div className={clsx(styles["form-control-toggle"], "!-mb-2")}>
                 <Checkbox id="isCompleted" register={register("isCompleted")} />

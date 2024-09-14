@@ -1,17 +1,22 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
 
 import { file, folder, folderOpen } from "@/constants/icons";
-import useTree from "@/hooks/useTree";
-import { ITree } from "@/types/tree";
+import { ITree, ITreeResponse } from "@/types/tree";
 import { findTreeItemRecursive } from "@/lib/utils";
 
 import styles from "../Folders.module.scss";
+import { TreeContext } from "@/providers/TreeProvider";
+import axios from "axios";
+import { IResponse } from "@/types/api";
+import { EAPI_URL } from "@/constants/path";
+import { CATCH_ERROR_MESSAGE } from "@/constants";
+import RenderIf from "@/components/RenderIf";
 
 interface IProps {
   node: ITree;
@@ -27,12 +32,14 @@ function TreeNode(props: IProps) {
 
   const {
     trees,
+    isLoadingTree,
     treeActive,
     treeEditId,
     setTrees,
+    setIsLoadingTree,
     setTreeActive,
     setTreeEditId,
-  } = useTree((state) => state);
+  } = useContext(TreeContext);
 
   // Get name for rename tree
   useEffect(() => {
@@ -57,7 +64,11 @@ function TreeNode(props: IProps) {
     }));
   };
 
-  const handleUpdateIsOpen = (trees: ITree[], id: string): ITree[] => {
+  const handleUpdateIsOpen = (
+    trees: ITree[],
+    id: number,
+    childrenNodes: ITree[]
+  ): ITree[] => {
     const newTrees = trees.map((item) => {
       // Case item has isOpen = true
       if (item.id === id && item.children.length && item.isOpen) {
@@ -69,31 +80,62 @@ function TreeNode(props: IProps) {
       }
 
       if (item.id === id) {
-        return { ...item, isOpen: !item.isOpen };
+        return { ...item, isOpen: !item.isOpen, children: [...childrenNodes] };
       }
 
       if (item.children.length) {
-        return { ...item, children: handleUpdateIsOpen(item.children, id) };
+        return {
+          ...item,
+          children: handleUpdateIsOpen(item.children, id, childrenNodes),
+        };
       }
 
       return { ...item };
     });
 
-    // sessionStorage.setItem("newTrees", JSON.stringify(newTrees));
     return newTrees;
   };
 
-  const handleOpenFolder = (folderId: string) => {
-    const getNewTrees = () => {
+  const handleOpenFolder = async (treeItem: ITree) => {
+    const updateTreeWithChildren = (children: ITree[]) => {
       const item = findTreeItemRecursive<ITree>(
         trees,
-        (item) => !!(folderId && item.id === folderId)
+        (item) => !!(treeItem.id && item.id === treeItem.id)
       );
-      if (!item) return [...trees];
-      return handleUpdateIsOpen(trees, folderId);
+
+      return item
+        ? handleUpdateIsOpen(trees, treeItem.id, children)
+        : [...trees];
     };
 
-    setTrees(getNewTrees());
+    if (treeItem.children.length) {
+      setTrees(updateTreeWithChildren(treeItem.children));
+      return;
+    }
+
+    setIsLoadingTree(true);
+
+    try {
+      const { data: childrenNodeData } = await axios.get<
+        IResponse<ITreeResponse[]>
+      >(`${EAPI_URL.TREES}/${treeItem.id}`);
+
+      if (childrenNodeData.errorMessage) {
+        toast.error(childrenNodeData.errorMessage);
+        return;
+      }
+
+      if (!childrenNodeData.data.length) {
+        toast.error("This folder has no files.");
+        return;
+      }
+
+      setTrees(updateTreeWithChildren(childrenNodeData.data));
+    } catch (error) {
+      toast.error(CATCH_ERROR_MESSAGE);
+    } finally {
+      setIsLoadingTree(false);
+    }
   };
 
   const handleDoubleClick = (treeItem: ITree) => {
@@ -101,17 +143,12 @@ function TreeNode(props: IProps) {
       return router.push(`/file/${treeItem.id}`);
     }
 
-    if (treeItem.children.length) {
-      return handleOpenFolder(treeItem.id);
-    } else {
-      toast.error("This folder has no files.");
-      return null;
-    }
+    return handleOpenFolder(treeItem);
   };
 
   const handleUpdateTreeItem = () => {
     if (newName === treeActive?.name) {
-      setTreeEditId("");
+      setTreeEditId(NaN);
       return;
     }
 
@@ -130,7 +167,7 @@ function TreeNode(props: IProps) {
     };
 
     setTrees([...updateTreeItemById(trees)]);
-    setTreeEditId("");
+    setTreeEditId(NaN);
   };
 
   return (
@@ -144,7 +181,7 @@ function TreeNode(props: IProps) {
         onClick={(e) => {
           e.stopPropagation();
           setTreeActive(node);
-          setTreeEditId("");
+          setTreeEditId(NaN);
         }}
         onDoubleClick={() => handleDoubleClick(node)}
       >
@@ -175,6 +212,10 @@ function TreeNode(props: IProps) {
               : node.name}
           </p>
         )}
+
+        <RenderIf isTrue={!!(isLoadingTree && treeActive?.id === node.id)}>
+          <span className={clsx(styles.loader)}></span>
+        </RenderIf>
       </div>
 
       <AnimatePresence>

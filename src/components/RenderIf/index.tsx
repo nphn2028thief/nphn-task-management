@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { AnimatePresence } from "framer-motion";
 
 interface IProps {
   isTrue: boolean;
@@ -8,7 +9,7 @@ interface IProps {
 function RenderIf(props: IProps) {
   const { isTrue, children } = props;
 
-  return isTrue ? children : null;
+  return <AnimatePresence>{isTrue ? children : null}</AnimatePresence>;
 }
 
 export default RenderIf;

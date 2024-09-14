@@ -1,10 +1,10 @@
-import moment from "moment";
+import dayjs from "dayjs";
 
 export const formatDate = (date: string) => {
-  return moment(date).format("DD/MM/YYYY");
+  return dayjs(date).format("DD/MM/YYYY");
 };
 
-export const findTreeItemRecursive = <T extends { id: string; children: T[] }>(
+export const findTreeItemRecursive = <T extends { id: number; children: T[] }>(
   trees: T[],
   predicate: (item: T) => boolean
 ): T | undefined => {
@@ -25,3 +25,7 @@ export const findTreeItemRecursive = <T extends { id: string; children: T[] }>(
 
   return undefined;
 };
+
+export function cn(...classes: any[]) {
+  return classes.filter(Boolean).join(" ");
+}

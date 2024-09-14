@@ -14,7 +14,6 @@ import { CATCH_ERROR_MESSAGE } from "@/constants";
 import useTheme from "@/hooks/useTheme";
 import { IResponse } from "@/types/api";
 import { ITask } from "@/types/task";
-import { formatDate } from "@/lib/utils";
 
 import styles from "../List/TaskList.module.scss";
 
@@ -95,7 +94,7 @@ function TaskItem(props: IProps) {
       <div className="flex-1 flex flex-col gap-1">
         <h2>{data.title}</h2>
         <p className="flex-1 text-sm line-clamp-3">{data.description}</p>
-        <p className="text-sm">{formatDate(data.date)}</p>
+        <p className="text-sm">{data.date}</p>
       </div>
       <div className="flex justify-between items-center">
         {/* Status */}
