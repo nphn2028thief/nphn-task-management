@@ -32,12 +32,12 @@ export const tasks = pgTable("tasks", {
 // Trees table
 export const trees = pgTable("trees", {
   id: serial("id").primaryKey(),
-  name: text("title").notNull(),
+  name: text("name").notNull(),
   type: typeEnum("type").notNull(),
   fileType: fileTypeEnum("file_type"),
   level: integer("level").notNull(),
   isOpen: boolean("is_open").notNull(),
-  parentId: text("parent_id"),
+  parentId: integer("parent_id"),
   userId: text("user_id").notNull(),
   createdAt: timestamp("created_at", { mode: "string" })
     .notNull()

@@ -1,0 +1,1 @@
+ALTER TABLE "trees" ALTER COLUMN "parent_id" SET DATA TYPE integer;

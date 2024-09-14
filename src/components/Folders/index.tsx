@@ -1,17 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import clsx from "clsx";
 import { Menu, Item, Separator, useContextMenu } from "react-contexify";
-import { createId } from "@paralleldrive/cuid2";
 import axios from "axios";
+import { useUser } from "@clerk/nextjs";
+import toast from "react-hot-toast";
 
+import { AppContext } from "@/providers/AppProvider";
+import { TreeContext } from "@/providers/TreeProvider";
 import RenderIf from "../RenderIf";
 import TreeNode from "./TreeNode";
 import { EAPI_URL } from "@/constants/path";
+import { CATCH_ERROR_MESSAGE } from "@/constants";
 import { filePlus, folderPlus, rename, trash } from "@/constants/icons";
-import useTree from "@/hooks/useTree";
-import { ITree, TFileType, TLevel, Type } from "@/types/tree";
+import { IResponse } from "@/types/api";
+import { ITree, ITreeRequest, ITreeResponse, TLevel, Type } from "@/types/tree";
 import { findTreeItemRecursive } from "@/lib/utils";
 
 import styles from "./Folders.module.scss";
@@ -22,139 +26,176 @@ const MENU_ID = "menu-context-id";
 function Folders() {
   const [showContextOverlay, setShowContextOverlay] = useState<boolean>(false);
 
+  const { setIsLoading } = useContext(AppContext);
   const {
     trees,
     treeActive,
-    treesActive,
     setTrees,
+    setIsLoadingTree,
     setTreeActive,
-    setTreesActive,
     setTreeEditId,
-  } = useTree((state) => state);
+  } = useContext(TreeContext);
+
+  const { user } = useUser();
 
   const { show, hideAll } = useContextMenu({ id: MENU_ID });
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const getRootTrees = async () => {
-      try {
-        const { data } = await axios.get(EAPI_URL.TREES, {
-          signal: controller.signal,
-        });
-        console.log(data);
-      } catch (error) {}
-    };
-
-    getRootTrees();
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
-
-  // Get trees from Session storage
-  useEffect(() => {
-    const newTrees = sessionStorage.getItem("newTrees");
-
-    if (newTrees) {
-      setTrees([...JSON.parse(newTrees)]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleAddTreeItem = async (type: Type) => {
-    const data: ITree = {
-      id: createId(),
-      name: type === "FOLDER" ? "New Folder 2" : "New File",
-      type,
-      level: 1,
-      isOpen: false,
-      children: [],
-    };
-
-    const parts = data.name.split(".");
-    const fileType = parts.length > 1 ? parts[parts.length - 1] : "txt";
-    data.fileType = type === "FILE" ? (fileType as TFileType) : undefined;
-
-    let newTrees = [];
-
-    // const item = findTreeItem(trees, treeActive?.id);
-    const parentTree = findTreeItemRecursive<ITree>(
-      trees,
-      (item) => !!(treeActive && item.id === treeActive.id)
-    );
-
-    if (parentTree) {
-      // Create inside children of active folder
-      data.level = (parentTree.level + 1) as TLevel;
-      parentTree.isOpen = true;
-      parentTree.children.push(data);
-
-      newTrees = trees.map((prevItem) => {
-        if (prevItem.id === parentTree.id) {
-          return { ...prevItem, parentTree };
+    const getLevel = () => {
+      if (treeActive) {
+        switch (treeActive.level) {
+          case 1:
+            return 2;
+          case 2:
+            return 3;
+          case 3:
+            return 4;
+          default:
+            return 4;
         }
-
-        return prevItem;
-      });
-    } else {
-      // Create at Root folder
-      newTrees = [...trees, { ...data }];
-    }
-
-    hideAll();
-    setTreeActive(data);
-    setTreesActive([...treesActive, data]);
-    setTreeEditId(data.id);
-    setTrees([...newTrees]);
-
-    // try {
-    //   const { data: responseData } = await axios.post<IResponse<ITreeResponse>>(
-    //     EAPI_URL.TREES,
-    //     data
-    //   );
-
-    //   if (responseData.errorMessage) {
-    //     toast.error(responseData.errorMessage);
-    //     return;
-    //   }
-
-    //   newTrees = [...trees, { ...responseData }];
-
-    //   // setTreeActive(data);
-    //   // setTreeEditId(data.id);
-    //   hideAll();
-    //   // sessionStorage.setItem("newTrees", JSON.stringify(newTrees));
-    //   // setTrees([...newTrees]);
-    //   toast.success("Create new folder successfully!");
-    // } catch (error) {
-    //   toast.error(CATCH_ERROR_MESSAGE);
-    // }
-  };
-
-  const handleDeleteTreeItemById = (trees: ITree[]): ITree[] => {
-    const newTrees = trees.reduce((acc: ITree[], curr) => {
-      if (treeActive && curr.id !== treeActive.id) {
-        if (curr.children.length) {
-          curr.children = handleDeleteTreeItemById(curr.children);
-        }
-        acc.push(curr);
       }
 
-      return acc;
-    }, []);
+      return 1;
+    };
 
-    // sessionStorage.setItem("newTrees", JSON.stringify(newTrees));
-    return newTrees;
+    const requestData: ITreeRequest = {
+      name: type === "FILE" ? "file" : "New folder",
+      type,
+      fileType: type === "FILE" ? "txt" : undefined,
+      level: getLevel(),
+      isOpen: false,
+      parentId: treeActive?.id ?? null,
+    };
+
+    if (treeActive && treeActive.id) {
+      // Loading on parent node
+      setIsLoadingTree(true);
+    } else {
+      // Global loading
+      setIsLoading(true);
+    }
+
+    try {
+      const { data: responseData } = await axios.post<IResponse<ITreeResponse>>(
+        EAPI_URL.TREES,
+        requestData
+      );
+
+      if (responseData.errorMessage) {
+        toast.error(responseData.errorMessage);
+        return;
+      }
+
+      // Case has parent id (child node)
+      if (treeActive && treeActive.id) {
+        try {
+          const { data: childrenNodeData } = await axios.get<
+            IResponse<ITreeResponse[]>
+          >(`${EAPI_URL.TREES}/${treeActive.id}`);
+
+          if (childrenNodeData.errorMessage) {
+            toast.error(childrenNodeData.errorMessage);
+            return;
+          }
+
+          const handleUpdateTrees = (trees: ITree[]) => {
+            return trees.map((item) => {
+              if (item.id === treeActive.id) {
+                return {
+                  ...item,
+                  isOpen: true,
+                  children: [...childrenNodeData.data],
+                };
+              }
+
+              if (item.children.length) {
+                handleUpdateTrees(item.children);
+              }
+
+              return item;
+            });
+          };
+
+          const updatedTrees = handleUpdateTrees(trees);
+          setTrees(updatedTrees);
+          return;
+        } catch (error) {
+          toast.error(CATCH_ERROR_MESSAGE);
+        }
+      }
+
+      // Case root node
+      setTrees([...trees, { ...responseData.data }]);
+    } catch (error) {
+      toast.error(CATCH_ERROR_MESSAGE);
+    } finally {
+      setShowContextOverlay(false);
+      setIsLoading(false);
+      setIsLoadingTree(false);
+    }
+  };
+
+  const handleDeleteTreeItemById = async () => {
+    // const newTrees = trees.reduce((acc: ITree[], curr) => {
+    //   if (treeActive && curr.id !== treeActive.id) {
+    //     if (curr.children.length) {
+    //       curr.children = handleDeleteTreeItemById(curr.children);
+    //     }
+    //     acc.push(curr);
+    //   }
+
+    //   return acc;
+    // }, []);
+
+    if (treeActive) {
+      setIsLoading(true);
+
+      try {
+        const { data: responseData } = await axios.delete<IResponse<number>>(
+          `${EAPI_URL.TREES}/${treeActive?.id}`
+        );
+
+        if (responseData.errorMessage) {
+          toast.error(responseData.errorMessage);
+          return;
+        }
+
+        const filterTree = (trees: ITree[]): ITree[] => {
+          return trees
+            .filter((item) => {
+              // Điều kiện loại bỏ phần tử có id hoặc parentId trùng với responseData.data
+              return (
+                item.id !== responseData.data &&
+                item.parentId !== responseData.data
+              );
+            })
+            .map((item) => {
+              // Nếu có children, áp dụng filter đệ quy
+              if (item.children.length) {
+                return {
+                  ...item,
+                  children: filterTree(item.children), // Lọc lại children
+                };
+              }
+              return item; // Không có children thì trả về chính item
+            });
+        };
+
+        setTrees(filterTree(trees));
+      } catch (error) {
+        toast.error(CATCH_ERROR_MESSAGE);
+      } finally {
+        setIsLoading(false);
+        handleResetTreeActive();
+      }
+    }
   };
 
   const handleResetTreeActive = () => {
     setShowContextOverlay(false);
     hideAll();
     setTreeActive(null);
-    setTreesActive([]);
-    setTreeEditId("");
+    setTreeEditId(NaN);
   };
 
   return (
@@ -207,14 +248,7 @@ function Folders() {
             <i className={rename}></i>
             Rename
           </Item>
-          <Item
-            onClick={() => {
-              if (treeActive) {
-                setTrees([...handleDeleteTreeItemById(trees)]);
-                handleResetTreeActive();
-              }
-            }}
-          >
+          <Item onClick={handleDeleteTreeItemById}>
             <i className={trash}></i>
             Delete
           </Item>

@@ -8,6 +8,20 @@
       "when": 1724558554056,
       "tag": "20240825040234_lumpy_scarlet_spider",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1725757457470,
+      "tag": "20240908010417_sweet_fenris",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1725760368544,
+      "tag": "20240908015248_charming_hitman",
+      "breakpoints": true
     }
   ]
 }

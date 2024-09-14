@@ -20,31 +20,22 @@ async function POST(req: Request, res: Response) {
       return NextResponse.json({ errorMessage: "Bad request", status: 400 });
     }
 
-    const newTree = await db.insert(trees).values({
-      name,
-      type,
-      fileType,
-      level,
-      isOpen,
-      parentId,
-      userId,
+    const newTree = await db
+      .insert(trees)
+      .values({
+        name,
+        type,
+        fileType,
+        level,
+        isOpen,
+        parentId,
+        userId,
+      })
+      .returning();
+    return NextResponse.json({
+      data: newTree.map((item) => ({ ...item, children: [] }))[0],
+      status: 201,
     });
-
-    // prismaClient.trees.create({
-    //   data: {
-    //     name,
-    //     type,
-    //     fileType,
-    //     level,
-    //     isOpen,
-    //     parentId,
-    //     children: {
-    //       create: [],
-    //     },
-    //     userId,
-    //   },
-    // });
-    return NextResponse.json({ data: newTree, status: 201 });
   } catch (error) {
     console.error("Create tree: ", error);
     return NextResponse.json({
@@ -67,7 +58,10 @@ async function GET(req: Request, res: Response) {
       .from(trees)
       .where(sql`${trees.userId} = ${userId} AND ${trees.parentId} IS NULL`);
 
-    return NextResponse.json({ data: allRootTrees, status: 200 });
+    return NextResponse.json({
+      data: allRootTrees.map((item) => ({ ...item, children: [] })),
+      status: 200,
+    });
   } catch (error) {
     console.error("Get trees error: ", error);
     return NextResponse.json({

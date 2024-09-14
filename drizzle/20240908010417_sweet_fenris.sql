@@ -1,0 +1,1 @@
+ALTER TABLE "trees" RENAME COLUMN "title" TO "name";

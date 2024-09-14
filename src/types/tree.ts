@@ -3,12 +3,13 @@ export type TFileType = "txt" | "md";
 export type TLevel = 1 | 2 | 3 | 4;
 
 export interface ITree {
-  id: string;
+  id: number;
   name: string;
   type: Type;
   fileType?: TFileType;
   level: TLevel;
   isOpen: boolean;
+  parentId: number | null;
   children: ITree[];
 }
 
@@ -18,19 +19,17 @@ export interface ITreeRequest {
   fileType?: TFileType;
   level: TLevel;
   isOpen: boolean;
-  parentId: string | null;
-  children: ITree[];
+  parentId: number | null;
 }
 
 export interface ITreeResponse {
-  id: string;
+  id: number;
   name: string;
   type: Type;
   fileType?: TFileType;
   level: TLevel;
   isOpen: boolean;
-  parentId: string | null;
-  parent: ITreeResponse | null;
+  parentId: number | null;
   children: ITree[];
   createdAt: string;
   updatedAt: string;
