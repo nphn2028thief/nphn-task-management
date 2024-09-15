@@ -92,6 +92,7 @@ function TaskPanel() {
   }, [dateValue]);
 
   const handleCloseModal = () => {
+    setIsLoading(false);
     setIsOpenModal(false);
     setTask(null);
     setTaskId(null);
@@ -138,8 +139,7 @@ function TaskPanel() {
     } catch (error) {
       toast.error(CATCH_ERROR_MESSAGE);
     } finally {
-      setIsOpenModal(false);
-      setIsLoading(false);
+      handleCloseModal();
     }
   };
 

@@ -19,7 +19,6 @@ import clsx from "clsx";
 
 import Datepicker from "../Datepicker";
 import RenderIf from "@/components/RenderIf";
-import { formatDate } from "@/lib/utils";
 
 import styles from "./InputDatepicker.module.scss";
 
@@ -55,8 +54,14 @@ function InputDatepicker<T extends FieldValues>(props: IProps<T>) {
   useEffect(() => {
     const handlePosition = () => {
       if (inputRef.current) {
-        const { x, height } = inputRef.current.getBoundingClientRect();
-        setPosition({ top: `${height}px`, right: `${x}px` });
+        const { x, y, height } = inputRef.current.getBoundingClientRect();
+        console.log(
+          "inputRef.current.getBoundingClientRect(): ",
+          inputRef.current.getBoundingClientRect()
+        );
+        // y + height: appears below the input
+        // y - height * 8 + 6: appears above the input
+        setPosition({ top: `${y - height * 8 + 6}px`, right: `${x}px` });
       }
     };
 
@@ -73,7 +78,7 @@ function InputDatepicker<T extends FieldValues>(props: IProps<T>) {
     (date: dayjs.Dayjs) => {
       setValue(
         name,
-        formatDate(date.toDate().toLocaleDateString()) as PathValue<T, Path<T>>
+        date.toDate().toLocaleDateString() as PathValue<T, Path<T>>
       );
       setShowDatepicker(false);
     },

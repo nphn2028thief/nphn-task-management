@@ -1,7 +1,10 @@
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
-export const formatDate = (date: string) => {
-  return dayjs(date).format("DD/MM/YYYY");
+dayjs.extend(customParseFormat);
+
+export const formatDate = (date: string | dayjs.Dayjs | Date) => {
+  return dayjs(date).format("YYYY-MM-DD");
 };
 
 export const findTreeItemRecursive = <T extends { id: number; children: T[] }>(

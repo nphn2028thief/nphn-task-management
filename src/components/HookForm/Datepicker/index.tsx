@@ -2,6 +2,7 @@
 
 import { Dispatch, memo, SetStateAction, useRef, useState } from "react";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useOnClickOutside } from "usehooks-ts";
 import { motion } from "framer-motion";
 import clsx from "clsx";
@@ -12,6 +13,8 @@ import { cn } from "@/lib/utils";
 import { generateDate, months } from "@/lib/calendar";
 
 import styles from "./Datepicker.module.scss";
+
+dayjs.extend(customParseFormat);
 
 interface IProps {
   position: any;
